@@ -25,7 +25,8 @@ export default class  App extends Component {
        this.createTodoItem('Drink coffee'),
        this.createTodoItem('Watch anime'),
        this.createTodoItem('Create React App'),
-    ]
+    ],
+    term: ''
     }
 
     deleteItem = ( id ) => {
@@ -40,11 +41,11 @@ export default class  App extends Component {
      })
     }
 
-    togglePropery( arr, id, propName) {
+    toggleProperty( arr, id, propName) {
       const idx =arr.findIndex( (el) => el.id === id );
       const oldItem = arr[idx];
       const newItem = {...oldItem, [propName]: !oldItem[propName]};
-     return [
+      return [
          ...arr.slice(0, idx),
          newItem,
          ...arr.slice(idx + 1)
@@ -61,10 +62,19 @@ export default class  App extends Component {
        });
     }
 
+    search = (items, term) => {
+     if (term === '') return items;
+
+    return items.filter( (item)=> {
+      return item.text.toLowerCase().indexOf(term.toLowerCase()) > -1;
+     })
+      
+    }
+
     onToggleImportant = (id) => {
       this.setState( ({ todoData }) => {
          return  {
-           todoData: this.togglePropery(todoData, id, 'important')
+           todoData: this.toggleProperty(todoData, id, 'important')
          };
       });
     } 
@@ -72,24 +82,33 @@ export default class  App extends Component {
     onToggleDone = (id) => {
       this.setState( ({ todoData }) => {
          return  {
-           todoData: this.togglePropery(todoData, id, 'done')
+           todoData: this.toggleProperty(todoData, id, 'done')
          };
       });
     }
 
+    onSearchChange = ( term ) => {
+      this.setState({
+        term
+      })
+    }
+
     render (){
-      const { todoData } = this.state;
+      const { todoData, term } = this.state;
+      const visibleTodo = this.search(todoData, term);
       const doneCount = todoData.filter( (el) => el.done === true).length;
       const todoCount = todoData.length - doneCount;
     return (
         <div className="todo-app">
         <AppHeader toDo={todoCount} done={doneCount} />
         <div className="top-panel d-flex">
-          <SearchBar />
+          <SearchBar
+          onSearchChange = {this.onSearchChange}
+          />
           <ItemStatusFilter />
         </div>
   
-        <TodoList todos={todoData}
+        <TodoList todos={visibleTodo}
         onDelete={ this.deleteItem } 
         onToggleDone={this.onToggleDone}
         onToggleImportant={this.onToggleImportant}

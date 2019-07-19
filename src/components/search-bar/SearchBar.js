@@ -1,12 +1,27 @@
-import React from 'react'
+import React, {Component} from 'react'
 import './search-bar.css'
 
-const SearchBar = () => {
-    return (
-        <div>
-            <input type="text" placeholder="Search" className="form-control search-input"></input>
-        </div>
-    );
-};
+export default class SearchBar  extends Component {
+    state = {
+        term:''
+    }
 
-export default SearchBar;
+    onSearch = ( event ) => {
+        const term = event.target.value;
+        this.setState({
+            term
+        });
+        this.props.onSearchChange(term);
+    }   
+
+    render(){
+
+        return (
+        <div>
+            <input type="text" placeholder="Search" className="form-control search-input"
+            onChange={this.onSearch}
+            value={this.state.term}></input>
+        </div>
+     );
+    }   
+}
